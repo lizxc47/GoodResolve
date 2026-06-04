@@ -27,7 +27,7 @@ You may not, without prior written permission from the copyright holders:
 
 Commercial use, including use in commercial products, services, platforms, consulting, contract research, hosted services, software-as-a-service products, or internal business operations, is not permitted without prior written permission from the copyright holders.
 
-For commercial licensing, industrial collaboration, or other uses not permitted by this license, please contact: wdp@ciac.ac.cn.
+For commercial licensing, industrial collaboration, or other uses not permitted by this license, please contact: wdp@ciac.ac.cn or rtli@ciac.ac.cn.
 
 3. Patent Notice
 
