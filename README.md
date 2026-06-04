@@ -1,8 +1,8 @@
-# GoodResolve Stage 1–2–3 Prediction Pipeline
+# GoodResolve Stage 1--2--3 Prediction Pipeline
 
 > **Public source-available research release.** GoodResolve is made publicly available after the filing of a patent application covering aspects of the method, including Chinese patent application No. CN202610751112.3. This repository is intended to support academic inspection, manuscript reproducibility, and non-commercial research use in infrared-spectrum-based molecular and mixture structure identification.
-
-The source code is provided under the GoodResolve Source-Available Academic Research License. This is not an OSI-approved open-source license. Commercial use, redistribution, sublicensing, hosted-service use, or integration into commercial products, services, platforms, or software pipelines is not permitted without prior written permission. No patent license is granted by this public source-available release.
+>
+> The source code is provided under the GoodResolve Source-Available Academic Research License. This is not an OSI-approved open-source license. Commercial use, redistribution, sublicensing, hosted-service use, or integration into commercial products, services, platforms, or software pipelines is not permitted without prior written permission. No patent license is granted by this public source-available release. See `LICENSE` for details.
 
 GoodResolve is an infrared-spectrum-based molecular and mixture structure identification workflow. Two root-level execution scripts are provided:
 
@@ -13,8 +13,7 @@ GoodResolve is an infrared-spectrum-based molecular and mixture structure identi
 
 Both scripts can be executed directly from the project root. By default, both pipelines start from row index 0 of their configured input CSV files.
 
-The provided example configuration is intentionally lightweight. It is designed for quick execution and functional verification of the Stage 1–2–3 workflow, rather than for reproducing the full-scale production. For the provided mixture example, successful prediction can be completed in approximately 9 hours on our hardware using single-threaded CPU execution together with one GPU. The hardware used for this test was an Intel(R) Xeon(R) Gold 6136 CPU @ 3.00 GHz and an NVIDIA RTX 4090 GPU. In addition, we provide a smaller quick-test parameter setting to verify that the full pipeline can run successfully; under the same hardware configuration, this quick test can be completed in approximately 10 minutes. The quick-test setting is intended only to check whether the workflow executes correctly and is not expected to guarantee accurate prediction results.
-
+The provided example configuration is intentionally lightweight. It is designed for quick execution and functional verification of the Stage 1--2--3 workflow, rather than for reproducing the full-scale production or manuscript-scale experiments. For the provided mixture example, successful prediction can be completed in approximately 9 hours on our hardware using single-threaded CPU execution together with one GPU. The hardware used for this test was an Intel(R) Xeon(R) Gold 6136 CPU @ 3.00 GHz, 256 GB RAM, and an NVIDIA RTX 4090 GPU. In addition, we provide a smaller quick-test parameter setting to verify that the full pipeline can run successfully; under the same hardware configuration, this quick test can be completed in approximately 10 minutes. The quick-test setting is intended only to check whether the workflow executes correctly and is not expected to guarantee accurate prediction results.
 
 ---
 
@@ -167,7 +166,7 @@ phase
 400, 402, 404, ..., 4000
 ```
 
-`Mixture` is the true mixture SMILES column. The mixture script uses `START=0` by default. With the default `LIMIT="10"` and `NUM_TARGETS=0`, it processes rows 0–9 unless these parameters are modified.
+`Mixture` is the true mixture SMILES column. The mixture script uses `START=0` by default. With the default `LIMIT="10"` and `NUM_TARGETS=0`, it processes rows 0--9 unless these parameters are modified.
 
 ---
 
@@ -332,7 +331,7 @@ LIMIT="10"
 NUM_TARGETS=0
 ```
 
-This means the script starts from row 0 and processes rows 0–9 by default. To run from row 0 to the end of the input file, set:
+This means the script starts from row 0 and processes rows 0--9 by default. To run from row 0 to the end of the input file, set:
 
 ```bash
 LIMIT=""
@@ -570,27 +569,33 @@ If CUDA is unavailable, recreate the environment using `environment.yml` or inst
 
 ---
 
-## 11. License and review status
+## 11. License and patent notice
 
-This repository is provided under the `GoodResolve Confidential Review License`.
+This repository is released under the `GoodResolve Source-Available Academic Research License`. See `LICENSE` for details.
 
 Current status:
 
 ```text
-Confidential review use only
-Not currently released as public open-source software
-No redistribution
-No commercial use
-No patent license granted
+Public source-available research release
+Academic and non-commercial research use only
+Commercial use requires prior written permission
+Redistribution, sublicensing, hosted-service use, and integration into commercial products or platforms are not permitted without prior written permission
+No patent license granted by this release
 Pending patent application: CN202610751112.3
 ```
 
-Reviewers may inspect, run, test, and locally modify the code only as reasonably necessary to verify the associated manuscript. Public release, redistribution, independent research reuse, commercial use, or integration into other projects is not permitted without separate written permission.
+GoodResolve is publicly released after the filing of a patent application covering aspects of the method, including Chinese patent application No. CN202610751112.3. The public availability of this repository is intended to support academic inspection, manuscript reproducibility, and non-commercial research use.
 
-A separate public, research-use, or other license may be provided after completion of the review, publication, or patent-related process.
+Commercial use, redistribution, sublicensing, hosted-service use, or integration into commercial products, services, platforms, or software pipelines is not permitted without prior written permission from the copyright holders.
+
+For commercial licensing, industrial collaboration, or other uses not permitted by this license, please contact the corresponding author at [[email@example.com](mailto:email@example.com)].
+
+Third-party libraries, tools, datasets, pretrained models, and external resources are governed by their own licenses and terms. Users are responsible for complying with all applicable third-party requirements.
 
 ---
 
 ## 12. Notes
 
-The example settings included in this repository are lightweight settings intended to help reviewers quickly run the code and verify the workflow. Larger-scale experiments can be performed by increasing the number of targets, generated candidates, GA generations, and candidate counts in the execution scripts.
+The example settings included in this repository are lightweight settings intended to help users quickly run the code and verify the workflow. Larger-scale experiments can be performed by increasing the number of targets, generated candidates, GA generations, and candidate counts in the execution scripts.
+
+This repository may not include all datasets, pretrained models, or third-party resources used in the full-scale manuscript experiments. Users should obtain any required external datasets or models from their original sources and comply with their respective licenses and terms of use.
