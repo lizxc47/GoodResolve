@@ -1,6 +1,6 @@
 # GoodResolve Stage 1–2–3 Prediction Pipeline
 
-> **Confidential review package.** This repository is provided solely for confidential peer-review, editorial evaluation, and manuscript verification. It is not currently released as public open-source software, but is provided to reviewers for inspection, execution, testing, and verification of the associated manuscript. The associated methods are under pending patent application, including Chinese patent application No. CN202610751112.3. A separate public, research-use, or other license may be provided after completion of the review, publication, or patent-related process. See `LICENSE` for details.
+> **Confidential review package.** This repository is provided solely for confidential peer-review, editorial evaluation, and manuscript verification. It is not currently released as public open-source software, but is provided to reviewers for inspection, execution, testing, and verification of the associated manuscript. The associated methods are under pending patent application, including Chinese patent application No. CN202610751112.3. A separate public, research-use, or other license will be provided after completion of the review, publication, or patent-related process. See `LICENSE` for details.
 
 GoodResolve is an infrared-spectrum-based molecular and mixture structure identification workflow. Two root-level execution scripts are provided:
 
