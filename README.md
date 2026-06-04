@@ -588,7 +588,7 @@ GoodResolve is publicly released after the filing of a patent application coveri
 
 Commercial use, redistribution, sublicensing, hosted-service use, or integration into commercial products, services, platforms, or software pipelines is not permitted without prior written permission from the copyright holders.
 
-For commercial licensing, industrial collaboration, or other uses not permitted by this license, please contact the corresponding author at [[email@example.com](mailto:email@example.com)].
+For commercial licensing, industrial collaboration, or other uses not permitted by this license, please contact the author at wdp@ciac.ac.cn or rtli@ciac.ac.cn.
 
 Third-party libraries, tools, datasets, pretrained models, and external resources are governed by their own licenses and terms. Users are responsible for complying with all applicable third-party requirements.
 
