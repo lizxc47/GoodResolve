@@ -1,743 +1,594 @@
-# GoodResolve
+# GoodResolve Stage 1–2–3 Prediction Pipeline
 
-GoodResolve is an infrared-spectrum-based molecular resolution framework for pure compounds and mixtures. It integrates spectral retrieval, BRICS-based molecular building-block assembly, molecular-structure-to-spectrum prediction, spectrum encoding, and functional-group-aware reranking to infer candidate molecular structures from infrared spectra without requiring molecular formula constraints.
+> **Confidential review package.** This repository is provided solely for confidential peer-review, editorial evaluation, and manuscript verification. It is not currently released as public open-source software, but is provided to reviewers for inspection, execution, testing, and verification of the associated manuscript. The associated methods are under pending patent application, including Chinese patent application No. CN202610751112.3. A separate public, research-use, or other license may be provided after completion of the review, publication, or patent-related process. See `LICENSE` for details.
 
-This repository provides the source code, pretrained model weights, configuration files, synthetic demonstration spectra, candidate libraries, data manifests, and scripts required to run the main GoodResolve inference workflow.
-
-> **Note:** GoodResolve is the subject of pending patent applications. This repository is provided for Science editorial assessment, scholarly peer review, reproducibility, and non-commercial academic research only. Commercial use is not permitted, and no patent license is granted. See [LICENSE](LICENSE) for details.
-
----
-
-## Overview
-
-GoodResolve is designed to address molecular identification and mixture resolution from infrared spectra. Unlike formula-constrained approaches, GoodResolve does not require molecular formula information as input.
-
-The workflow contains three major stages:
-
-### Stage 1: Spectral retrieval
-
-Candidate molecular structures are retrieved from a molecular candidate library according to infrared spectral similarity.
-
-### Stage 2: Molecular building-block assembly
-
-Retrieved candidates are decomposed into BRICS fragments. These fragments, together with a global fragment library, are recombined to generate chemically plausible candidate structures beyond direct spectral-library retrieval.
-
-### Stage 3: Functional-group-aware reranking
-
-Candidate structures are reranked according to spectral consistency, molecular validity, predicted infrared spectra, spectrum-encoding similarity, and functional-group-level agreement with the target infrared spectrum.
-
-GoodResolve supports:
-
-- Pure-compound molecular resolution from IR spectra
-- Binary-mixture resolution
-- Ternary-mixture resolution
-- Candidate generation beyond direct database retrieval
-- Inference without molecular formula constraints
-- Reproducible evaluation using top-k ranking metrics
-
----
-
-## Repository structure
+GoodResolve is an infrared-spectrum-based molecular and mixture structure identification workflow. Two root-level execution scripts are provided:
 
 ```text
-GoodResolve/
-├── README.md
-├── LICENSE
-├── CITATION.cff
-├── requirements.txt
-├── environment.yml
-├── configs/
-│   ├── pure.yaml
-│   ├── binary_mixture.yaml
-│   └── ternary_mixture.yaml
-├── goodresolve/
-│   ├── preprocessing/
-│   ├── stage1_retrieval/
-│   ├── stage2_building_blocks/
-│   ├── stage3_reranking/
-│   ├── mixture/
-│   └── metrics/
-├── scripts/
-│   ├── run_goodresolve_demo.py
-│   ├── run_stage1.py
-│   ├── run_stage2.py
-│   ├── run_stage3.py
-│   ├── evaluate_topk.py
-│   └── download_models.py
-├── examples/
-│   ├── pure_compound/
-│   ├── binary_mixture/
-│   └── ternary_mixture/
-├── models/
-│   └── README.md
-├── data_manifests/
-│   ├── training_sources.csv
-│   └── third_party_spectral_sources.csv
-└── docs/
-    ├── input_format.md
-    ├── model_availability.md
-    ├── data_availability.md
-    ├── reproduce_main_results.md
-    └── third_party_data.md
+./run_stage123_prediction_pure_compounds.sh   # pure-compound prediction
+./run_stage123_prediction_mixture.sh          # mixture prediction
 ```
+
+Both scripts can be executed directly from the project root. By default, both pipelines start from row index 0 of their configured input CSV files.
+
+The provided example configuration is intentionally lightweight. It is designed for quick execution and functional verification of the Stage 1–2–3 workflow, rather than for reproducing the full-scale production. For the provided mixture example, successful prediction can be completed in approximately 9 hours on our hardware using single-threaded CPU execution together with one GPU. The hardware used for this test was an Intel(R) Xeon(R) Gold 6136 CPU @ 3.00 GHz and an NVIDIA RTX 4090 GPU. In addition, we provide a smaller quick-test parameter setting to verify that the full pipeline can run successfully; under the same hardware configuration, this quick test can be completed in approximately 10 minutes. The quick-test setting is intended only to check whether the workflow executes correctly and is not expected to guarantee accurate prediction results.
+
 
 ---
 
-## Installation
+## 1. Directory structure
 
-We recommend creating a new conda environment.
+The expected project layout is:
+
+```text
+./
+├── README.md
+├── LICENSE
+├── REVIEWER_ONLY_NOTICE.md
+├── environment.yml
+├── requirements.txt
+├── run_stage123_prediction_pure_compounds.sh
+├── run_stage123_prediction_mixture.sh
+│
+├── stage1/
+│   ├── all_prediction_graphormer_rnn_sdbs.py
+│   ├── local_pytorch/
+│   ├── checkpoints_sdbs_graphormer_ir_1minusT/
+│   └── smiles_rnn_token_checkpoint.pth
+│
+├── stage2/
+│   ├── all_prediction_GA_small_molecular.py
+│   ├── data_fragments.csv
+│   ├── local_pytorch/
+│   └── checkpoints_sdbs_graphormer_ir_1minusT/
+│
+├── stage3/
+│   ├── stage3_final_rerank.py
+│   ├── model3_stage3_data/
+│   └── model3_stage3_runs/
+│
+├── test_data/
+│   └── test_data.csv
+│
+├── result/
+│
+└── mixture/
+    ├── stage1/
+    │   ├── all_prediction_graphormer_rnn_sdbs_mixture_weighted_irsis.py
+    │   ├── ir_sis.py
+    │   ├── local_pytorch/
+    │   ├── checkpoints_sdbs_graphormer_ir_1minusT/
+    │   └── smiles_rnn_token_checkpoint.pth
+    │
+    ├── stage2/
+    │   ├── all_prediction_GA_small_molecular.py
+    │   ├── local_pytorch/
+    │   └── checkpoints_sdbs_graphormer_ir_1minusT/
+    │
+    ├── stage3/
+    │   ├── stage3_final_rerank.py
+    │   ├── model3_stage3_data/
+    │   └── model3_stage3_runs/
+    │
+    ├── mixture_by_fragment_count/
+    │   └── fragment_libraries_per_file/
+    │       ├── binary_frag*_with_sis_data_fragments.csv
+    │       └── ternary_frag*_with_sis_data_fragments.csv
+    │
+    ├── test_data/
+    │   └── *_with_sis.csv
+    │
+    └── ternary_frag3/
+        └── result_mixture/
+```
+
+The root-level `./stage1`, `./stage2`, and `./stage3` folders are used by the pure-compound prediction script. The `./mixture/stage1`, `./mixture/stage2`, and `./mixture/stage3` folders are used by the mixture prediction script. The root-level `./stage2` folder is also used by the mixture script for the single-component reconstruction logic.
+
+---
+
+## 2. Environment setup
+
+The recommended installation method is `conda` with `environment.yml`:
 
 ```bash
 conda env create -f environment.yml
 conda activate goodresolve
 ```
 
-Alternatively, dependencies can be installed using pip:
+The tested core environment is:
+
+```text
+Python        3.12.2
+NumPy         1.26.4
+Pandas        2.2.2
+SciPy         1.13.1
+tqdm          4.66.5
+RDKit         2023.09.1
+PyTorch       2.4.0
+Torch CUDA    11.8
+TorchVision   0.19.0
+scikit-learn  1.5.1
+Matplotlib    3.9.2
+```
+
+To check whether PyTorch can access CUDA:
 
 ```bash
-pip install -r requirements.txt
-```
-
-The recommended environment is:
-
-```text
-Python >= 3.10
-PyTorch >= 2.0
-RDKit
-NumPy
-Pandas
-SciPy
-scikit-learn
-tqdm
-PyYAML
+python - <<'PY'
+import torch
+print("torch:", torch.__version__)
+print("torch cuda:", torch.version.cuda)
+print("cuda available:", torch.cuda.is_available())
+print("gpu count:", torch.cuda.device_count())
+PY
 ```
 
 ---
 
-## Pretrained model weights
+## 3. Input data
 
-The repository includes pretrained GoodResolve model weights or scripts for accessing them.
+### Pure-compound prediction
 
-The pretrained components include:
+The default pure-compound input file is:
 
 ```text
-models/
-├── graphormer_ir_predictor.pt
-├── spectrum_encoder.pt
-├── model_iii_reranker.pt
-├── rnn_generator.pt
-└── fragment_library.csv
+./test_data/test_data.csv
 ```
 
-The released model weights include:
+The input CSV should contain the molecular structure column and the target IR spectral columns, for example:
 
-- Molecular-structure-to-spectrum prediction models
-- Spectrum-encoding models
-- Candidate-generation models
-- Functional-group-aware candidate reranking models
+```text
+smiles
+phase
+400, 402, 404, ..., 4000
+```
 
-The pretrained weights were trained using spectral data from public and third-party spectral databases as described in the manuscript. Raw spectra, bulk processed spectra, and retrieval indices derived from restricted third-party spectral databases are not redistributed in this repository.
+### Mixture prediction
+
+The default mixture input file is configured in:
+
+```text
+./run_stage123_prediction_mixture.sh
+```
+
+For example, the current mixture script may use:
+
+```text
+./mixture/test_data/ternary_frag3_with_sis.csv
+```
+
+The mixture input CSV should contain:
+
+```text
+Mixture
+phase
+400, 402, 404, ..., 4000
+```
+
+`Mixture` is the true mixture SMILES column. The mixture script uses `START=0` by default. With the default `LIMIT="10"` and `NUM_TARGETS=0`, it processes rows 0–9 unless these parameters are modified.
 
 ---
 
-## Quick start
+## 4. Main execution scripts
 
-### Pure-compound example
+The execution scripts are located in the project root:
+
+```text
+./run_stage123_prediction_pure_compounds.sh
+./run_stage123_prediction_mixture.sh
+```
+
+Before running, make sure both scripts have Unix line endings and execute permission:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/pure_compound/input_ir_synthetic.csv \
-  --mode pure \
-  --config configs/pure.yaml \
-  --out outputs/demo_pure
+sed -i 's/\r$//' run_stage123_prediction_pure_compounds.sh
+sed -i 's/\r$//' run_stage123_prediction_mixture.sh
+
+chmod +x run_stage123_prediction_pure_compounds.sh
+chmod +x run_stage123_prediction_mixture.sh
 ```
 
-Expected outputs:
-
-```text
-outputs/demo_pure/
-├── stage1_retrieval_topk.csv
-├── stage2_generated_candidates.csv
-├── stage3_reranked_candidates.csv
-└── summary.json
-```
-
-### Binary-mixture example
+Run pure-compound prediction:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/binary_mixture/input_ir_synthetic.csv \
-  --mode binary \
-  --config configs/binary_mixture.yaml \
-  --out outputs/demo_binary
+./run_stage123_prediction_pure_compounds.sh
 ```
 
-### Ternary-mixture example
+Run mixture prediction:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/ternary_mixture/input_ir_synthetic.csv \
-  --mode ternary \
-  --config configs/ternary_mixture.yaml \
-  --out outputs/demo_ternary
+./run_stage123_prediction_mixture.sh
 ```
 
 ---
 
-## Input format
+## 5. Pipeline stages
 
-GoodResolve expects an absorbance-like infrared spectrum.
+### Stage 1: RNN generation and Graphormer-IR SIS scoring
 
-The recommended input format is:
-
-```text
-wavenumber,absorbance
-4000,0.012
-3998,0.015
-3996,0.018
-...
-400,0.034
-```
-
-GoodResolve also supports vectorized spectral columns:
+For pure-compound prediction, Stage 1 calls:
 
 ```text
-sample_id,sp_400,sp_402,...,sp_4000
-sample_001,0.034,0.035,...,0.012
+./stage1/all_prediction_graphormer_rnn_sdbs.py
 ```
 
-The default wavenumber grid is:
+For mixture prediction, Stage 1 calls:
 
 ```text
-400–4000 cm^-1 with a step size of 2 cm^-1
+./mixture/stage1/all_prediction_graphormer_rnn_sdbs_mixture_weighted_irsis.py
 ```
 
-If the input spectrum is provided on a different grid, it is interpolated to the predefined grid before inference.
+Stage 1 performs candidate generation, forward-IR prediction, and SIS scoring. For mixture prediction, Stage 1 additionally constructs 1-, 2-, and 3-component candidates and evaluates predefined mixture ratios.
 
-Transmittance spectra should be converted to absorbance-like spectra before running GoodResolve.
+### Stage 2: fragment-based GA reconstruction
 
-See [docs/input_format.md](docs/input_format.md) for details.
+For pure-compound prediction, Stage 2 uses:
+
+```text
+./stage2/all_prediction_GA_small_molecular.py
+```
+
+For mixture prediction:
+
+```text
+component_1:
+  ./stage2/all_prediction_GA_small_molecular.py
+
+component_2 and component_3:
+  ./mixture/stage2/all_prediction_GA_small_molecular.py
+```
+
+Stage 2 outputs elite candidates such as:
+
+```text
+generation_${GA_GENERATIONS}_elites.csv
+```
+
+### Stage 3: final reranking
+
+For pure-compound prediction, Stage 3 calls:
+
+```text
+./stage3/stage3_final_rerank.py
+```
+
+For mixture prediction, Stage 3 calls:
+
+```text
+./mixture/stage3/stage3_final_rerank.py
+```
+
+Stage 3 reranks Stage 2 candidates using:
+
+```text
+SIS score
+Model III-based signature-consistency score
+A candidate-intrinsic molecular feature prior
+```
+
+The default reranking weights are:
+
+```text
+w_sis     = 0.15
+w_model3  = 0.15
+w_feature = 0.70
+feature   = heavy_asc
+```
 
 ---
 
-## Output format
+## 6. Important script parameters
 
-The final ranked candidate file contains:
+### Pure-compound script
 
-```text
-rank
-candidate_smiles
-canonical_smiles
-mode
-stage1_sis
-stage2_source
-predicted_spectrum_score
-spectrum_encoder_score
-model3_score
-functional_group_score
-final_score
-is_valid_smiles
-```
-
-For mixture cases, additional columns are provided:
+Edit the following parameters in:
 
 ```text
-component_1_smiles
-component_2_smiles
-component_3_smiles
-mixture_pseudo_smiles
-mixture_ratio
+./run_stage123_prediction_pure_compounds.sh
 ```
 
----
-
-## Reproducing manuscript results
-
-Scripts and configuration files for reproducing the main GoodResolve inference workflow are provided in this repository.
-
-Example:
+Default sample selection:
 
 ```bash
-python scripts/evaluate_topk.py \
-  --pred outputs/demo_pure/stage3_reranked_candidates.csv \
-  --target examples/pure_compound/target_smiles.txt \
-  --topk 1 3 5 10
+TARGET_INDICES=""
+START_INDEX=0
+NUM_TARGETS=1000
 ```
 
-For detailed instructions, see:
-
-```text
-docs/reproduce_main_results.md
-```
-
-The full benchmark experiments may require access to third-party spectral databases. Raw spectra and bulk processed spectra from restricted third-party databases are not redistributed. Source identifiers, preprocessing scripts, and data manifests are provided where permitted.
-
----
-
-## Data availability
-
-This repository provides:
-
-- Source code
-- Pretrained model weights
-- Configuration files
-- Synthetic demonstration spectra
-- Candidate libraries
-- Data manifests
-- Scripts for inference and evaluation
-- Documentation for reproducing the main workflow
-
-Raw spectra from third-party spectral databases are not redistributed when database-specific terms restrict redistribution. Where permitted, this repository provides source identifiers, preprocessing scripts, and data manifests.
-
-Users should obtain third-party spectral data directly from the corresponding database providers and follow their terms of use.
-
-See:
-
-```text
-docs/data_availability.md
-docs/third_party_data.md
-data_manifests/
-```
-
----
-
-## Third-party data
-
-GoodResolve may use spectral data from public and third-party spectral databases as described in the associated manuscript.
-
-This repository does not redistribute:
-
-- Raw spectra from restricted third-party databases
-- Bulk processed spectra derived from restricted third-party databases
-- Retrieval indices derived from restricted third-party spectral databases
-- Embedding databases that may substitute for restricted third-party databases
-
-The released model weights are not intended to redistribute, reconstruct, or substitute for any third-party spectral database.
-
----
-
-## License
-
-GoodResolve is released under the **GoodResolve Research Use License**.
-
-The source code, pretrained model weights, configuration files, example materials, and documentation are provided for:
-
-- Science editorial assessment
-- Scholarly peer review
-- Reproducibility
-- Non-commercial academic research
-
-Commercial use is not permitted. GoodResolve is the subject of pending patent applications, and no patent license is granted by this repository release.
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## Citation
-
-If you use GoodResolve, the pretrained model weights, or any materials from this repository in academic publications, presentations, or derivative research, please cite the associated manuscript and this repository.
-
-```bibtex
-@misc{goodresolve2026,
-  title = {GoodResolve: Infrared-spectrum-based molecular resolution of pure compounds and mixtures},
-  author = {Li, Ruitao and co-workers},
-  year = {2026},
-  url = {https://github.com/YOUR_ACCOUNT/GoodResolve},
-  note = {Version v1.0.0-submission}
-}
-```
-
-The citation information will be updated after publication.
-
----
-
-## Contact
-
-For questions about academic use, reproducibility, or manuscript review, please contact:
-
-```text
-[Contact name]
-[Institution]
-[Email address]
-```
-
-For patent licensing, commercial use, or collaboration inquiries, please contact the corresponding rights holder or institutional technology transfer office.
-
----
-
-## Disclaimer
-
-GoodResolve is provided for research and scholarly reproducibility only. It is not intended for medical diagnosis, clinical decision-making, regulatory compliance, forensic use, safety-critical systems, or any use where incorrect molecular identification may cause harm, legal consequences, financial loss, or safety risks.
-
-The software, model weights, and outputs are provided "as is", without warranty of any kind.# GoodResolve
-
-GoodResolve is an infrared-spectrum-based molecular resolution framework for pure compounds and mixtures. It integrates spectral retrieval, BRICS-based molecular building-block assembly, molecular-structure-to-spectrum prediction, spectrum encoding, and functional-group-aware reranking to infer candidate molecular structures from infrared spectra without requiring molecular formula constraints.
-
-This repository provides the source code, pretrained model weights, configuration files, synthetic demonstration spectra, candidate libraries, data manifests, and scripts required to run the main GoodResolve inference workflow.
-
-> **Note:** GoodResolve is the subject of pending patent applications. This repository is provided for Science editorial assessment, scholarly peer review, reproducibility, and non-commercial academic research only. Commercial use is not permitted, and no patent license is granted. See [LICENSE](LICENSE) for details.
-
----
-
-## Overview
-
-GoodResolve is designed to address molecular identification and mixture resolution from infrared spectra. Unlike formula-constrained approaches, GoodResolve does not require molecular formula information as input.
-
-The workflow contains three major stages:
-
-### Stage 1: Spectral retrieval
-
-Candidate molecular structures are retrieved from a molecular candidate library according to infrared spectral similarity.
-
-### Stage 2: Molecular building-block assembly
-
-Retrieved candidates are decomposed into BRICS fragments. These fragments, together with a global fragment library, are recombined to generate chemically plausible candidate structures beyond direct spectral-library retrieval.
-
-### Stage 3: Functional-group-aware reranking
-
-Candidate structures are reranked according to spectral consistency, molecular validity, predicted infrared spectra, spectrum-encoding similarity, and functional-group-level agreement with the target infrared spectrum.
-
-GoodResolve supports:
-
-- Pure-compound molecular resolution from IR spectra
-- Binary-mixture resolution
-- Ternary-mixture resolution
-- Candidate generation beyond direct database retrieval
-- Inference without molecular formula constraints
-- Reproducible evaluation using top-k ranking metrics
-
----
-
-## Repository structure
-
-```text
-GoodResolve/
-├── README.md
-├── LICENSE
-├── CITATION.cff
-├── requirements.txt
-├── environment.yml
-├── configs/
-│   ├── pure.yaml
-│   ├── binary_mixture.yaml
-│   └── ternary_mixture.yaml
-├── goodresolve/
-│   ├── preprocessing/
-│   ├── stage1_retrieval/
-│   ├── stage2_building_blocks/
-│   ├── stage3_reranking/
-│   ├── mixture/
-│   └── metrics/
-├── scripts/
-│   ├── run_goodresolve_demo.py
-│   ├── run_stage1.py
-│   ├── run_stage2.py
-│   ├── run_stage3.py
-│   ├── evaluate_topk.py
-│   └── download_models.py
-├── examples/
-│   ├── pure_compound/
-│   ├── binary_mixture/
-│   └── ternary_mixture/
-├── models/
-│   └── README.md
-├── data_manifests/
-│   ├── training_sources.csv
-│   └── third_party_spectral_sources.csv
-└── docs/
-    ├── input_format.md
-    ├── model_availability.md
-    ├── data_availability.md
-    ├── reproduce_main_results.md
-    └── third_party_data.md
-```
-
----
-
-## Installation
-
-We recommend creating a new conda environment.
+This means the script starts from row 0 and processes the first 1000 rows by default. To run the full test set, set:
 
 ```bash
-conda env create -f environment.yml
-conda activate goodresolve
+NUM_TARGETS=0
 ```
 
-Alternatively, dependencies can be installed using pip:
+Common runtime parameters:
 
 ```bash
-pip install -r requirements.txt
+NUM_GENERATE=10000
+GA_NUM_GENERATE=1000
+GA_GENERATIONS=20
+
+STAGE1_GPU=0
+STAGE2_GPU=0
+STAGE3_GPU=0
 ```
 
-The recommended environment is:
+### Mixture script
+
+Edit the following parameters in:
 
 ```text
-Python >= 3.10
-PyTorch >= 2.0
-RDKit
-NumPy
-Pandas
-SciPy
-scikit-learn
-tqdm
-PyYAML
+./run_stage123_prediction_mixture.sh
 ```
 
----
-
-## Pretrained model weights
-
-The repository includes pretrained GoodResolve model weights or scripts for accessing them.
-
-The pretrained components include:
-
-```text
-models/
-├── graphormer_ir_predictor.pt
-├── spectrum_encoder.pt
-├── model_iii_reranker.pt
-├── rnn_generator.pt
-└── fragment_library.csv
-```
-
-The released model weights include:
-
-- Molecular-structure-to-spectrum prediction models
-- Spectrum-encoding models
-- Candidate-generation models
-- Functional-group-aware candidate reranking models
-
-The pretrained weights were trained using spectral data from public and third-party spectral databases as described in the manuscript. Raw spectra, bulk processed spectra, and retrieval indices derived from restricted third-party spectral databases are not redistributed in this repository.
-
----
-
-## Quick start
-
-### Pure-compound example
+Default target selection:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/pure_compound/input_ir_synthetic.csv \
-  --mode pure \
-  --config configs/pure.yaml \
-  --out outputs/demo_pure
+TARGET_INDICES=""
+START=0
+LIMIT="10"
+NUM_TARGETS=0
 ```
 
-Expected outputs:
-
-```text
-outputs/demo_pure/
-├── stage1_retrieval_topk.csv
-├── stage2_generated_candidates.csv
-├── stage3_reranked_candidates.csv
-└── summary.json
-```
-
-### Binary-mixture example
+This means the script starts from row 0 and processes rows 0–9 by default. To run from row 0 to the end of the input file, set:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/binary_mixture/input_ir_synthetic.csv \
-  --mode binary \
-  --config configs/binary_mixture.yaml \
-  --out outputs/demo_binary
+LIMIT=""
+NUM_TARGETS=0
 ```
 
-### Ternary-mixture example
+Common runtime parameters:
 
 ```bash
-python scripts/run_goodresolve_demo.py \
-  --input examples/ternary_mixture/input_ir_synthetic.csv \
-  --mode ternary \
-  --config configs/ternary_mixture.yaml \
-  --out outputs/demo_ternary
+FRAG_COUNT=3
+COMPONENT_COUNTS="1,2,3"
+
+NUM_GENERATE=10000
+NUM_MIXTURE_CANDIDATES=10000
+
+GA_NUM_GENERATE=1000
+GA_GENERATIONS=5
+
+RUN_COMPONENT_1=true
+RUN_COMPONENT_2=true
+RUN_COMPONENT_3=true
+
+STAGE1_GPU=0
+STAGE2_GPU=0
+STAGE3_GPU=0
 ```
 
 ---
 
-## Input format
+## 7. Quick tests
 
-GoodResolve expects an absorbance-like infrared spectrum.
+Because both scripts start from row 0 by default, the provided example run is a lightweight configuration for quick execution and functional verification. For a faster smoke test, further reduce the generation scale as shown below.
 
-The recommended input format is:
-
-```text
-wavenumber,absorbance
-4000,0.012
-3998,0.015
-3996,0.018
-...
-400,0.034
-```
-
-GoodResolve also supports vectorized spectral columns:
-
-```text
-sample_id,sp_400,sp_402,...,sp_4000
-sample_001,0.034,0.035,...,0.012
-```
-
-The default wavenumber grid is:
-
-```text
-400–4000 cm^-1 with a step size of 2 cm^-1
-```
-
-If the input spectrum is provided on a different grid, it is interpolated to the predefined grid before inference.
-
-Transmittance spectra should be converted to absorbance-like spectra before running GoodResolve.
-
-See [docs/input_format.md](docs/input_format.md) for details.
-
----
-
-## Output format
-
-The final ranked candidate file contains:
-
-```text
-rank
-candidate_smiles
-canonical_smiles
-mode
-stage1_sis
-stage2_source
-predicted_spectrum_score
-spectrum_encoder_score
-model3_score
-functional_group_score
-final_score
-is_valid_smiles
-```
-
-For mixture cases, additional columns are provided:
-
-```text
-component_1_smiles
-component_2_smiles
-component_3_smiles
-mixture_pseudo_smiles
-mixture_ratio
-```
-
----
-
-## Reproducing manuscript results
-
-Scripts and configuration files for reproducing the main GoodResolve inference workflow are provided in this repository.
-
-Example:
+### Pure-compound quick test
 
 ```bash
-python scripts/evaluate_topk.py \
-  --pred outputs/demo_pure/stage3_reranked_candidates.csv \
-  --target examples/pure_compound/target_smiles.txt \
-  --topk 1 3 5 10
+sed -i 's/^NUM_TARGETS=.*/NUM_TARGETS=1/' run_stage123_prediction_pure_compounds.sh
+sed -i 's/^GA_GENERATIONS=.*/GA_GENERATIONS=1/' run_stage123_prediction_pure_compounds.sh
+sed -i 's/^GA_NUM_GENERATE=.*/GA_NUM_GENERATE=50/' run_stage123_prediction_pure_compounds.sh
+sed -i 's/^NUM_GENERATE=.*/NUM_GENERATE=1000/' run_stage123_prediction_pure_compounds.sh
+
+./run_stage123_prediction_pure_compounds.sh
 ```
 
-For detailed instructions, see:
+### Mixture quick test
+
+```bash
+sed -i 's/^LIMIT=.*/LIMIT="1"/' run_stage123_prediction_mixture.sh
+sed -i 's/^GA_GENERATIONS=.*/GA_GENERATIONS=1/' run_stage123_prediction_mixture.sh
+sed -i 's/^GA_NUM_GENERATE=.*/GA_NUM_GENERATE=50/' run_stage123_prediction_mixture.sh
+sed -i 's/^NUM_GENERATE=.*/NUM_GENERATE=1000/' run_stage123_prediction_mixture.sh
+sed -i 's/^NUM_MIXTURE_CANDIDATES=.*/NUM_MIXTURE_CANDIDATES=1000/' run_stage123_prediction_mixture.sh
+
+./run_stage123_prediction_mixture.sh
+```
+
+Expected mixture execution order:
 
 ```text
-docs/reproduce_main_results.md
+data_0:
+  Stage 1
+  component_1: Stage 2 SINGLE -> Stage 3
+  component_2: Stage 2 MIXTURE -> Stage 3
+  component_3: Stage 2 MIXTURE -> Stage 3
 ```
-
-The full benchmark experiments may require access to third-party spectral databases. Raw spectra and bulk processed spectra from restricted third-party databases are not redistributed. Source identifiers, preprocessing scripts, and data manifests are provided where permitted.
 
 ---
 
-## Data availability
+## 8. Output structure
 
-This repository provides:
+### Pure-compound output
 
-- Source code
-- Pretrained model weights
-- Configuration files
-- Synthetic demonstration spectra
-- Candidate libraries
-- Data manifests
-- Scripts for inference and evaluation
-- Documentation for reproducing the main workflow
-
-Raw spectra from third-party spectral databases are not redistributed when database-specific terms restrict redistribution. Where permitted, this repository provides source identifiers, preprocessing scripts, and data manifests.
-
-Users should obtain third-party spectral data directly from the corresponding database providers and follow their terms of use.
-
-See:
+Pure-compound results are saved under:
 
 ```text
-docs/data_availability.md
-docs/third_party_data.md
-data_manifests/
+./result/
 ```
 
----
-
-## Third-party data
-
-GoodResolve may use spectral data from public and third-party spectral databases as described in the associated manuscript.
-
-This repository does not redistribute:
-
-- Raw spectra from restricted third-party databases
-- Bulk processed spectra derived from restricted third-party databases
-- Retrieval indices derived from restricted third-party spectral databases
-- Embedding databases that may substitute for restricted third-party databases
-
-The released model weights are not intended to redistribute, reconstruct, or substitute for any third-party spectral database.
-
----
-
-## License
-
-GoodResolve is released under the **GoodResolve Research Use License**.
-
-The source code, pretrained model weights, configuration files, example materials, and documentation are provided for:
-
-- Science editorial assessment
-- Scholarly peer review
-- Reproducibility
-- Non-commercial academic research
-
-Commercial use is not permitted. GoodResolve is the subject of pending patent applications, and no patent license is granted by this repository release.
-
-See [LICENSE](LICENSE) for details.
-
----
-
-## Citation
-
-If you use GoodResolve, the pretrained model weights, or any materials from this repository in academic publications, presentations, or derivative research, please cite the associated manuscript and this repository.
-
-```bibtex
-@misc{goodresolve2026,
-  title = {GoodResolve: Infrared-spectrum-based molecular resolution of pure compounds and mixtures},
-  author = {Li, Ruitao and co-workers},
-  year = {2026},
-  url = {https://github.com/lizxc47/GoodResolve},
-  note = {Version v1.0.0-submission}
-}
-```
-
-The citation information will be updated after publication.
-
----
-
-## Contact
-
-For questions about academic use, reproducibility, or manuscript review, please contact:
+For sample `i`:
 
 ```text
-[Contact name]
-[Institution]
-[Email address]
+./result/pure_compounds/sample_i/
+├── data_i/
+│   ├── IR_data.csv
+│   ├── generated_smiles_round_1.csv
+│   ├── smiles_sis_predictions.csv
+│   ├── generation_${GA_GENERATIONS}_elites.csv
+│   └── stage3_final_*.csv
+└── logs/
+    ├── stage1.log
+    ├── stage2.log
+    └── stage3.log
 ```
 
-For patent licensing, commercial use, or collaboration inquiries, please contact the corresponding rights holder or institutional technology transfer office.
+### Mixture output
+
+Mixture results are saved under the output directory configured in:
+
+```text
+./run_stage123_prediction_mixture.sh
+```
+
+For example:
+
+```text
+./result/mixture/data_0/
+├── IR_data.csv
+├── generated_smiles_round_1.csv
+├── metadata.json
+├── smiles_sis_predictions.csv
+│
+├── components_1/
+│   ├── smiles_sis_predictions.csv
+│   ├── generation_${GA_GENERATIONS}_elites.csv
+│   ├── stage3_final_component1.csv
+│   └── stage3_final_component1_summary.csv
+│
+├── components_2/
+│   ├── smiles_sis_predictions.csv
+│   ├── generation_${GA_GENERATIONS}_elites.csv
+│   ├── stage3_final_component2.csv
+│   └── stage3_final_component2_summary.csv
+│
+└── components_3/
+    ├── smiles_sis_predictions.csv
+    ├── generation_${GA_GENERATIONS}_elites.csv
+    ├── stage3_final_component3.csv
+    └── stage3_final_component3_summary.csv
+```
 
 ---
 
-## Disclaimer
+## 9. Switching mixture fragment-count datasets
 
-GoodResolve is provided for research and scholarly reproducibility only. It is not intended for medical diagnosis, clinical decision-making, regulatory compliance, forensic use, safety-critical systems, or any use where incorrect molecular identification may cause harm, legal consequences, financial loss, or safety risks.
+The mixture script is configured through:
 
-The software, model weights, and outputs are provided "as is", without warranty of any kind.
+```text
+./run_stage123_prediction_mixture.sh
+```
+
+To run another fragment-count group, modify the following variables together:
+
+```bash
+IR_CSV="${ROOT}/test_data/binary_frag1_with_sis.csv"
+OUT_ROOT="${ROOT}/binary_frag1/result_mixture"
+FRAG_COUNT=1
+```
+
+For `frag3`:
+
+```bash
+IR_CSV="${ROOT}/test_data/ternary_frag3_with_sis.csv"
+OUT_ROOT="${ROOT}/ternary_frag3/result_mixture"
+FRAG_COUNT=3
+```
+
+Make sure the corresponding fragment libraries exist:
+
+```text
+binary_frag${FRAG_COUNT}_with_sis_data_fragments.csv
+ternary_frag${FRAG_COUNT}_with_sis_data_fragments.csv
+```
+
+---
+
+## 10. Troubleshooting
+
+### The wrong script is being used
+
+Use:
+
+```text
+./run_stage123_prediction_pure_compounds.sh
+```
+
+for pure-compound prediction, and use:
+
+```text
+./run_stage123_prediction_mixture.sh
+```
+
+for mixture prediction.
+
+### Component 1 calls the wrong Stage 2 script in mixture mode
+
+The correct mixture log should show:
+
+```text
+[Stage 2 SINGLE] data_i | component 1
+GA script   : ./stage2/all_prediction_GA_small_molecular.py
+```
+
+For `component_2` and `component_3`, the log should show:
+
+```text
+[Stage 2 MIXTURE] data_i | component 2
+GA script   : ./mixture/stage2/all_prediction_GA_small_molecular.py
+```
+
+### Component 2 or 3 candidate generation is slow
+
+This is expected. The GA accepts only candidates that pass validity, uniqueness, component-count, and SIS-scoring constraints. If the progress bar shows nonzero progress, the program is working.
+
+### Stage 3 cannot find candidates
+
+Stage 3 expects:
+
+```text
+generation_${GA_GENERATIONS}_elites.csv
+```
+
+If `GA_GENERATIONS=5`, it will look for:
+
+```text
+generation_5_elites.csv
+```
+
+Make sure Stage 2 produced that file.
+
+### CUDA is not available
+
+Check:
+
+```bash
+python - <<'PY'
+import torch
+print(torch.__version__)
+print(torch.version.cuda)
+print(torch.cuda.is_available())
+print(torch.cuda.device_count())
+PY
+```
+
+If CUDA is unavailable, recreate the environment using `environment.yml` or install PyTorch with CUDA 11.8.
+
+---
+
+## 11. License and review status
+
+This repository is provided under the `GoodResolve Confidential Review License`.
+
+Current status:
+
+```text
+Confidential review use only
+Not currently released as public open-source software
+No redistribution
+No commercial use
+No patent license granted
+Pending patent application: CN202610751112.3
+```
+
+Reviewers may inspect, run, test, and locally modify the code only as reasonably necessary to verify the associated manuscript. Public release, redistribution, independent research reuse, commercial use, or integration into other projects is not permitted without separate written permission.
+
+A separate public, research-use, or other license may be provided after completion of the review, publication, or patent-related process.
+
+---
+
+## 12. Notes
+
+The example settings included in this repository are lightweight settings intended to help reviewers quickly run the code and verify the workflow. Larger-scale experiments can be performed by increasing the number of targets, generated candidates, GA generations, and candidate counts in the execution scripts.
