@@ -14,10 +14,10 @@ All patent rights are expressly reserved unless separately granted in a written 
 
 Commercial use, industrial deployment, hosted-service use, integration into commercial products or platforms, sublicensing, or other uses outside the scope permitted by the accompanying `LICENSE` file require prior written permission from the copyright holders.
 
-For commercial licensing, industrial collaboration, or other uses not permitted by the accompanying license, please contact the corresponding author at:
+For commercial licensing, industrial collaboration, or other uses not permitted by the accompanying license, please contact the author at:
 
 ```text
-[email@example.com]
+wdp@ciac.ac.cn or rtli@ciac.ac.cn
 ```
 
 Third-party libraries, tools, datasets, pretrained models, and external resources are governed by their own licenses and terms. This patent notice does not grant any rights to third-party materials.
