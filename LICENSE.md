@@ -1,161 +1,69 @@
-GoodResolve Research Use License
+GoodResolve Confidential Review License
 
-Version 1.0
-Date: 2026-05-25
+Copyright (c) 2026 GoodResolve contributors. All rights reserved.
 
-Copyright (c) 2026 Changchun Institute of Applied Chemistry, Chinese Academy of Sciences and the GoodResolve authors.
-All rights reserved.
+This repository is provided solely as a confidential review package for peer-review, editorial evaluation, and manuscript verification purposes. It is not currently released as public open-source software.
 
-This GoodResolve Research Use License governs the use of the GoodResolve source code, pretrained model weights, configuration files, scripts, documentation, example files, candidate libraries, data manifests, and other materials distributed in this repository, except for third-party materials that are governed by their own licenses or terms of use.
+Patent Notice
 
-GoodResolve is provided to support scholarly peer review, manuscript evaluation, reproducibility, and non-commercial academic research. GoodResolve is the subject of pending patent applications. No patent license, commercial license, trademark license, database redistribution right, or other intellectual property right is granted except for the limited copyright permissions expressly stated below.
+The software, source code, scripts, models, workflows, algorithms, documentation, examples, and associated methods may be covered by pending patent rights, including Chinese patent application No. CN202610751112.3. All patent rights are expressly reserved. No patent license is granted by this confidential review release.
 
-1. Definitions
+1. Permitted Use
 
-1.1. "GoodResolve" means the software, algorithms, scripts, pretrained model weights, configuration files, documentation, example files, candidate libraries, data manifests, and related materials distributed in this repository.
+Authorized reviewers, editors, and evaluation personnel may access, inspect, run, and test the software solely for the purpose of evaluating, verifying, or reproducing the results reported in the associated manuscript.
 
-1.2. "Covered Materials" means all materials distributed in this repository that are owned or controlled by the copyright holders, including but not limited to source code, scripts, pretrained model weights, configuration files, documentation, synthetic demonstration spectra, candidate libraries, and data manifests.
+Reviewers may make temporary local modifications as reasonably necessary for debugging, path configuration, testing, runtime adaptation, or verification of the manuscript results, provided that such modified versions are not redistributed, published, shared, or used for any purpose outside the confidential review process.
 
-1.3. "Model Weights" means pretrained machine-learning model parameters distributed with GoodResolve, including but not limited to molecular-structure-to-spectrum prediction models, spectrum-encoding models, candidate-generation models, and candidate-reranking models.
+2. Restrictions
 
-1.4. "Non-commercial academic research" means research, scholarly review, manuscript evaluation, teaching, and reproducibility activities conducted by academic, governmental, or non-profit research institutions without commercial purpose or commercial advantage.
+Without prior written permission from the authors or rights holders, the recipient may not:
 
-1.5. "Commercial use" means any use intended for or directed toward commercial advantage, monetary compensation, product development, service provision, internal research or development by a for-profit entity, contract research for a commercial entity, fee-based consulting, commercial deployment, paid access, software-as-a-service, or integration into a commercial product, platform, database, workflow, or service.
+(a) redistribute, upload, publish, share, sublicense, transfer, or otherwise make available the software or any modified version to any third party;
 
-1.6. "Rights holders" means [Your Institution], the GoodResolve authors, and any other entities that own or control rights in the Covered Materials.
+(b) use the software for commercial purposes, product development, service provision, consulting, industrial deployment, clinical or analytical service operation, or any activity intended for commercial advantage;
 
-2. Limited permission for scholarly review and non-commercial research
+(c) use the software for independent research projects unrelated to evaluation or verification of the associated manuscript;
 
-Subject to the terms and conditions of this License, the rights holders grant you a limited, non-exclusive, non-transferable, non-sublicensable, revocable, royalty-free copyright permission to access, download, use, execute, inspect, and modify the Covered Materials solely for the following purposes:
+(d) incorporate the software into another project, public repository, software package, product, platform, or service;
 
-a. editorial assessment and peer review of the associated GoodResolve manuscript;
+(e) remove or alter copyright, patent, confidentiality, attribution, or license notices;
 
-b. non-commercial academic research;
+(f) use the software or associated methods in a manner that would imply a license to any pending or granted patent.
 
-c. scholarly reproducibility and verification of the results reported in the associated GoodResolve manuscript;
+3. Confidentiality
 
-d. teaching, academic demonstration, and internal evaluation within academic, governmental, or non-profit research institutions.
+The software, model files, datasets, unpublished results, technical details, and related materials should be treated as confidential review materials. Disclosure is permitted only as required within the applicable journal, conference, publisher, funding agency, institutional, or editorial review process.
 
-3. Permissions
+If any term of this License conflicts with mandatory confidentiality or review rules imposed by the journal, conference, publisher, or evaluation body, those review rules apply to the extent required for the review process.
 
-Under this License, you may:
+4. Patent Rights Reserved
 
-a. use and run the GoodResolve source code for non-commercial academic research and scholarly reproducibility;
+No license, right, covenant, or other permission is granted under any patent, patent application, or other intellectual property right, including but not limited to Chinese patent application No. CN202610751112.3.
 
-b. use the pretrained Model Weights for non-commercial academic research and scholarly reproducibility;
+All rights in pending patent applications, future patents, methods, workflows, models, algorithms, systems, and applications related to the software are expressly reserved by the authors and rights holders.
 
-c. modify the source code for internal non-commercial academic research;
+5. Attribution
 
-d. reproduce the main inference workflow described in the associated GoodResolve manuscript;
+If the software is discussed within the confidential review process, the project name "GoodResolve" should be used for identification. This License does not grant permission to use the project name, author names, institutional names, trademarks, service marks, or logos for endorsement, publicity, or any public-facing purpose.
 
-e. use the provided configuration files, scripts, synthetic demonstration spectra, candidate libraries, and data manifests for non-commercial academic research and reproducibility;
+6. Third-Party Components
 
-f. make copies of the Covered Materials as reasonably necessary for the permitted purposes above;
+The software may depend on third-party libraries, datasets, pretrained models, or tools. Such third-party materials are governed by their own licenses. Recipients are responsible for complying with all applicable third-party license terms.
 
-g. share limited portions of the Covered Materials confidentially with editors, reviewers, coauthors, or collaborators solely for scholarly peer review, manuscript evaluation, or non-commercial academic research, provided that this License and all copyright and patent notices are preserved.
+7. No Warranty
 
-4. Restrictions
+THE SOFTWARE IS PROVIDED "AS IS" FOR CONFIDENTIAL REVIEW PURPOSES ONLY, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, RELIABILITY, SECURITY, OR ERROR-FREE OPERATION.
 
-You may not, without prior written permission from the rights holders:
+8. Limitation of Liability
 
-a. use GoodResolve or any Covered Materials for any Commercial use;
+TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE AUTHORS AND RIGHTS HOLDERS SHALL NOT BE LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN CONNECTION WITH THE SOFTWARE OR THE USE, INSPECTION, TESTING, OR EVALUATION OF THE SOFTWARE.
 
-b. use GoodResolve or any Covered Materials in commercial products, commercial services, fee-based consulting, contract research for commercial entities, internal research or development by for-profit entities, or commercial decision-making workflows;
+9. Termination
 
-c. sell, lease, sublicense, rent, host, or otherwise provide GoodResolve, the Model Weights, or any Covered Materials to third parties as a product, service, application programming interface, database, platform, or hosted tool;
+This permission terminates automatically upon completion of the review or evaluation process, or immediately upon violation of any term of this License. After termination, continued use is not permitted unless separately authorized in writing, subject to any applicable journal, publisher, institutional, or editorial record-retention policy.
 
-d. redistribute the Covered Materials outside scholarly peer review or non-commercial academic collaboration, except as technically enabled by GitHub repository access and platform functionality;
+10. Future Release
 
-e. remove, obscure, or modify copyright notices, license notices, patent notices, attribution notices, or third-party notices;
+A separate public, research-use, or other license may be provided after completion of the review, publication, or patent-related process. No rights for public release, general research reuse, redistribution, commercial use, or patent use are granted under this confidential review license.
 
-f. use the GoodResolve name, logo, trademarks, project name, authors' names, or institutional names to endorse or promote any product, service, or derivative work without prior written permission;
-
-g. use the Model Weights or GoodResolve outputs to reconstruct, approximate, extract, redistribute, or substitute for third-party spectral databases or any restricted third-party datasets;
-
-h. distribute raw spectra, bulk processed spectra, retrieval indices, embedding databases, or other database-like materials derived from restricted third-party spectral databases unless you have obtained all necessary rights from the corresponding database providers;
-
-i. use GoodResolve or the Model Weights to build or operate a competing commercial spectral database, molecular-resolution service, spectrum-to-structure service, molecular-identification product, or commercial analytical platform;
-
-j. use GoodResolve in any manner that violates applicable laws, regulations, institutional policies, third-party database terms of use, or the rights of third parties.
-
-5. No patent license
-
-No license, covenant not to sue, or other rights are granted under any patent, patent application, invention disclosure, trade secret, know-how, or other intellectual property right owned or controlled by the rights holders, except for the limited copyright permissions expressly stated in this License.
-
-GoodResolve, including but not limited to its methods for infrared-spectrum-based molecular resolution, spectral retrieval, molecular building-block assembly, BRICS-based candidate generation, mixture pseudo-molecule construction, molecular-structure-to-spectrum prediction, spectrum encoding, functional-group-aware reranking, and candidate evaluation, is the subject of pending patent applications.
-
-Any use, implementation, commercialization, deployment, sublicensing, integration, or distribution of GoodResolve methods that practices or may practice patent-pending subject matter may require a separate written patent license from the rights holders.
-
-6. Model weights
-
-The pretrained Model Weights are provided only for non-commercial academic research, scholarly review, manuscript evaluation, and reproducibility.
-
-The Model Weights may have been trained using spectral data from public and third-party spectral databases as described in the associated manuscript. The release of the Model Weights does not grant any right to access, copy, redistribute, reconstruct, or substitute for the original third-party databases.
-
-Raw spectra, bulk processed spectra, retrieval indices, and embedding databases derived from restricted third-party spectral databases are not included unless explicitly stated. Users are responsible for obtaining any third-party data directly from the corresponding database providers and complying with their terms of use.
-
-7. Third-party materials
-
-This License does not apply to third-party software, libraries, databases, spectra, molecular structures, identifiers, or other materials that are governed by separate licenses or terms of use.
-
-Any third-party components, dependencies, or database-derived materials are subject to their own licenses, notices, and restrictions. Nothing in this License grants rights to redistribute third-party materials.
-
-Users are solely responsible for ensuring that their use of any third-party materials complies with the corresponding third-party licenses, database terms, and applicable laws.
-
-8. Attribution and citation
-
-If you use GoodResolve, the Model Weights, or any Covered Materials in academic publications, presentations, preprints, reports, or derivative research, you must cite the associated GoodResolve manuscript and this repository.
-
-You must preserve all copyright notices, license notices, patent notices, and attribution notices in all copies or substantial portions of the Covered Materials.
-
-Suggested citation information is provided in the repository's CITATION.cff file.
-
-9. Contributions
-
-Unless otherwise agreed in writing, any contributions, suggestions, bug reports, code changes, documentation edits, model improvements, or other submissions made to the GoodResolve repository may be used by the rights holders for research, development, patent prosecution, publication, maintenance, and distribution of GoodResolve.
-
-By submitting a contribution, you represent that you have the right to submit it and that your contribution does not knowingly violate any third-party rights or obligations.
-
-Submitting a contribution does not grant you any ownership interest in GoodResolve, any patent application, or any other intellectual property owned or controlled by the rights holders.
-
-10. No warranty
-
-THE COVERED MATERIALS ARE PROVIDED "AS IS" AND "AS AVAILABLE", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
-
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE RIGHTS HOLDERS DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, ACCURACY, COMPLETENESS, RELIABILITY, AVAILABILITY, SECURITY, AND ERROR-FREE OPERATION.
-
-THE RIGHTS HOLDERS DO NOT WARRANT THAT GOODRESOLVE, THE MODEL WEIGHTS, OR ANY OUTPUTS WILL BE CORRECT, COMPLETE, VALID, REPRODUCIBLE, CHEMICALLY ACCURATE, SPECTROSCOPICALLY ACCURATE, OR SUITABLE FOR ANY PARTICULAR PURPOSE.
-
-11. Limitation of liability
-
-TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE RIGHTS HOLDERS, AUTHORS, CONTRIBUTORS, INSTITUTIONS, OR AFFILIATES BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, CONSEQUENTIAL, PUNITIVE, OR OTHER DAMAGES ARISING FROM OR RELATED TO THIS LICENSE, GOODRESOLVE, THE MODEL WEIGHTS, THE COVERED MATERIALS, OR ANY USE OR INABILITY TO USE THEM.
-
-THIS LIMITATION APPLIES REGARDLESS OF THE LEGAL THEORY, WHETHER IN CONTRACT, TORT, NEGLIGENCE, STRICT LIABILITY, STATUTE, OR OTHERWISE, EVEN IF THE RIGHTS HOLDERS HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
-
-12. No medical, clinical, regulatory, or safety-critical use
-
-GoodResolve is provided for research and scholarly reproducibility only. It is not intended for medical diagnosis, clinical decision-making, regulatory compliance, forensic use, safety-critical systems, or any use where incorrect molecular identification may cause harm, legal consequences, financial loss, or safety risks.
-
-13. Termination
-
-The permissions granted under this License terminate automatically if you violate any term of this License.
-
-Upon termination, you must cease all use of the Covered Materials and destroy all copies in your possession or control, except copies that must be retained for legal, archival, or institutional compliance purposes.
-
-Sections concerning restrictions, no patent license, third-party materials, attribution, no warranty, limitation of liability, and termination shall survive termination.
-
-14. Additional permissions
-
-Any use beyond the scope of this License, including commercial use, patent use, redistribution, sublicensing, hosted service deployment, integration into commercial products or services, or use by for-profit entities, requires prior written permission from the rights holders.
-
-For permissions, patent licensing, commercial use, or collaboration inquiries, please contact:
-
-Ruotong Li
-Changchun Institute of Applied Chemistry, Chinese Academy of Sciences
-rtli@ciac.ac.cn
-
-15. Entire license
-
-This License constitutes the entire agreement governing your use of the Covered Materials, unless a separate written agreement has been executed by the rights holders.
-
-If any provision of this License is held to be unenforceable, the remaining provisions shall remain in full force and effect.
+End of License
