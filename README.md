@@ -77,10 +77,7 @@ The expected project layout is:
     │       └── ternary_frag*_with_sis_data_fragments.csv
     │
     ├── test_data/
-    │   └── *_with_sis.csv
-    │
-    └── ternary_frag3/
-        └── result_mixture/
+    └── *_with_sis.csv
 ```
 
 The root-level `./stage1`, `./stage2`, and `./stage3` folders are used by the pure-compound prediction script. The `./mixture/stage1`, `./mixture/stage2`, and `./mixture/stage3` folders are used by the mixture prediction script. The root-level `./stage2` folder is also used by the mixture script for the single-component reconstruction logic.
