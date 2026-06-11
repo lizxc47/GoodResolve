@@ -1,4 +1,4 @@
-# GoodResolve Stage 1--2--3 Prediction Pipeline
+# GoodResolve Stage Prediction Pipeline
 
 > **Public source-available research release.** GoodResolve is made publicly available after the filing of a patent application covering aspects of the method, including Chinese patent application No. CN202610751112.3. This repository is intended to support academic inspection, manuscript reproducibility, and non-commercial research use in infrared-spectrum-based molecular and mixture structure identification.
 >
